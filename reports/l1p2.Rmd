@@ -1,0 +1,73 @@
+---
+title: "L1P2"
+author: "Rafael Falcão"
+output:
+  prettydoc::html_pretty:
+    df_print: kable
+    theme: cayman
+    highlight: github
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+```{r setup}
+library(tidyverse)
+library(here)
+library(lubridate)
+theme_set(theme_bw())
+```
+
+```{r ETL}
+buscas = read_csv(here::here("data/search_data.csv"))
+```
+
+What is our daily overall clickthrough rate? How does it vary between the groups?
+
+```{r}
+buscas %>%
+    group_by(date = substr(session_start_date, 1, 10), group) %>%
+    summarise(click_mean = mean(num_clicks)) %>%
+    ggplot(aes(x = date, y = click_mean, color = group)) +
+    geom_point() + 
+    facet_grid(~group) +
+    labs(y = "Click Mean", x = "") +
+    labs(title = "Daily Overall Rate") + 
+    theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_text(hjust = 1, angle = 45), legend.position="none")
+```
+
+Which results do people tend to try first? How does it change day-to-day?
+
+```{r}
+
+```
+
+What is our daily overall zero results rate? How does it vary between the groups?
+
+```{r}
+
+buscas %>%
+    group_by(date = substr(session_start_date, 1, 10), group) %>%
+    summarise(mean_zero = mean(results == 0)) %>%
+    ggplot(aes(x = date, y = mean_zero, color = group)) +
+    geom_point() + 
+    facet_grid(~group) +
+    labs(y = "Zero Results Mean", x = "") +
+    labs(title = "Daily Overall Zero Results Rate") + 
+    theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_text(hjust = 1, angle = 45), legend.position="none")
+
+```
+
+Let session length be approximately the time between the first event and the last event in a session. Choose a variable from the dataset and describe its relationship to session length. Visualize the relationship.
+
+```{r}
+
+```
+
+Summarize your findings in an executive summary.
+
+```{r}
+
+```
