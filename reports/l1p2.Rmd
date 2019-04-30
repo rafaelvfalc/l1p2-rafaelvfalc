@@ -50,11 +50,11 @@ What is our daily overall zero results rate? How does it vary between the groups
 
 buscas %>%
     group_by(date = substr(session_start_date, 1, 10), group) %>%
-    summarise(mean_zero = mean(results == 0)) %>%
-    ggplot(aes(x = date, y = mean_zero, color = group)) +
+    summarise(count_zero = sum(results == 0), total = n()) %>%
+    ggplot(aes(x = date, y = count_zero/total , color = group)) +
     geom_point() + 
     facet_grid(~group) +
-    labs(y = "Zero Results Mean", x = "") +
+    labs(y = "Zero Results Overall", x = "") +
     labs(title = "Daily Overall Zero Results Rate") + 
     theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_text(hjust = 1, angle = 45), legend.position="none")
 
