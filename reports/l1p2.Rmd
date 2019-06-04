@@ -13,7 +13,7 @@ body {
 text-align: justify}
 </style>
 
-```{r setup}
+```{r setup, include=FALSE,  warning=FALSE}
 library(tidyverse)
 library(here)
 library(lubridate)
@@ -24,7 +24,23 @@ theme_set(theme_bw())
 buscas = read_csv(here::here("data/search_data.csv"))
 ```
 
-What is our daily overall clickthrough rate? How does it vary between the groups?
+# Questions
+
+#### 1. What is our daily overall clickthrough rate? How does it vary between the groups?
+
+```{r}
+buscas %>%
+    group_by(date = substr(session_start_date, 1, 10)) %>%
+    summarise(click_mean = mean(num_clicks)) %>%
+    ggplot(aes(x = date, y = click_mean)) +
+    geom_point() +
+    geom_line() +
+    labs(y = "Click Mean", x = "") +
+    labs(title = "Total Daily Overall Rate") + 
+    theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_text(hjust = 1, angle = 45), legend.position="none")
+```
+
+In the above figure it is represented the total Daily Overall Rate. It can be noticed that in the first three days contained in the data the Click Mean shows high results in comparison with the other five days contained in the data.
 
 ```{r}
 buscas %>%
@@ -35,11 +51,15 @@ buscas %>%
     geom_line() +
     facet_grid(~group) +
     labs(y = "Click Mean", x = "") +
-    labs(title = "Daily Overall Rate") + 
+    labs(title = "Daily Overall Rate (Group)") + 
     theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_text(hjust = 1, angle = 45), legend.position="none")
 ```
 
-Which results do people tend to try first? How does it change day-to-day?
+The above figure shows the daily overall clickthrough rate in each group. It can be notice that the group A has a high range of click mean through all days contained in the data in comparison with the click mean of the group B. It can be also noticed that the behaviour of the click mean of the first three days noticed in the graph 'Total Daily Overall Rate' it was inherited from the group A, given that in the first three days the click mean in the group A had values above 0.4 and in the group B had values bellow 0.1.
+
+#### 2. Which results do people tend to try first? How does it change day-to-day?
+
+Analyzing the data we can noticed that big part of the searches had the result value of 20, meaning that the search firstly returned 20 links to the user as option to click. Therefore, it is normal to infer that the big part of the users choose any of this 20 first links to click. The graph bellow shows only the 'first-click' in the first 20 links showed.
 
 ```{r}
 buscas %>%
@@ -48,26 +68,87 @@ buscas %>%
     geom_bar(fill = "#FF6666") +
     labs(y = "Count First Click", x = "First Click") +
     labs(title = "Results that people tend to try first")
-
-# Explicar cauda no texto
-# first_click tende a 20 por causa do número de resultados por página (20).
 ``` 
+
+We can notice that the users tend to click in the first link returned by the search. After that the second link, the third link and so on. This means that the users connects the order that the links appears in the results with the more appropriate link that is more likely to contain the information that it is looking for.
 
 ```{r}
-# Fazer isso para cada dia para mostrar o 90 percentil de cada dia.
-buscas %>%
-    group_by(date = substr(session_start_date, 1, 10)) %>%
-    filter(date == "2016-03-01") %>%
-    summary(first_click)
+#print("Day: 2016-03-01")
+buscas_dia_01 <- buscas %>%
+              group_by(date = substr(session_start_date, 1, 10))  %>%
+              filter(date == "2016-03-01")
 
-buscas %>%
-    group_by(date = substr(session_start_date, 1, 10)) %>%
-    filter(date == "2016-03-02") %>%
-    summary(first_click)
-    
+quantile(buscas_dia_01$first_click, prob=seq(0.95, 0.95), na.rm = TRUE)
+
+#print("Day: 2016-03-02")
+buscas_dia_02 <- buscas %>%
+              group_by(date = substr(session_start_date, 1, 10))  %>%
+              filter(date == "2016-03-02")
+
+quantile(buscas_dia_02$first_click, prob=seq(0.95, 0.95), na.rm = TRUE)
+
+#print("Day: 2016-03-03")
+buscas_dia_03 <- buscas %>%
+              group_by(date = substr(session_start_date, 1, 10))  %>%
+              filter(date == "2016-03-03")
+
+quantile(buscas_dia_03$first_click, prob=seq(0.95, 0.95), na.rm = TRUE)
+
+#print("Day: 2016-03-04")
+buscas_dia_04 <- buscas %>%
+              group_by(date = substr(session_start_date, 1, 10))  %>%
+              filter(date == "2016-03-04")
+
+quantile(buscas_dia_04$first_click, prob=seq(0.95, 0.95), na.rm = TRUE)
+
+#print("Day: 2016-03-05")
+buscas_dia_05 <- buscas %>%
+              group_by(date = substr(session_start_date, 1, 10))  %>%
+              filter(date == "2016-03-05")
+
+quantile(buscas_dia_05$first_click, prob=seq(0.95, 0.95), na.rm = TRUE)
+
+#print("Day: 2016-03-06")
+buscas_dia_06 <- buscas %>%
+              group_by(date = substr(session_start_date, 1, 10))  %>%
+              filter(date == "2016-03-06")
+
+quantile(buscas_dia_06$first_click, prob=seq(0.95, 0.95), na.rm = TRUE)
+
+#print("Day: 2016-03-07")
+buscas_dia_07 <- buscas %>%
+              group_by(date = substr(session_start_date, 1, 10))  %>%
+              filter(date == "2016-03-07")
+
+quantile(buscas_dia_07$first_click, prob=seq(0.95, 0.95), na.rm = TRUE)
+
+#print("Day: 2016-03-08")
+buscas_dia_08 <- buscas %>%
+              group_by(date = substr(session_start_date, 1, 10))  %>%
+              filter(date == "2016-03-08")
+
+quantile(buscas_dia_08$first_click, prob=seq(0.95, 0.95), na.rm = TRUE)
 ``` 
 
-What is our daily overall zero results rate? How does it vary between the groups?
+Above we can check in which links the user first clicked day-to-day. For example: In the day 2016-03-05 the 95% of the users first clicked the 9th link showed or bellow. We can notice that users usually use its first click in the  first 10 links showed by the results of the search. The only day that it is a exception is the day 2016-03-04, where the users first clicked the 12th link showed or bellow.
+
+#### 3. What is our daily overall zero results rate? How does it vary between the groups?
+
+```{r}
+
+buscas %>%
+    group_by(date = substr(session_start_date, 1, 10)) %>%
+    summarise(count_zero = sum(results == 0), total = n()) %>%
+    ggplot(aes(x = date, y = count_zero/total)) +
+    geom_point() + 
+    geom_line() +
+    labs(y = "Zero Results Overall", x = "") +
+    labs(title = "Total Daily Overall Zero Results Rate") + 
+    theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_text(hjust = 1, angle = 45), legend.position="none")
+
+```
+
+The above graph shows the daily overall zero results rate. We can observe that in the day 2016-03-08 we had a peak of the Zero Results Overall and in the 2016-03-06 we had the lowest overall value.
 
 ```{r}
 
@@ -79,19 +160,21 @@ buscas %>%
     geom_line() +
     facet_grid(~group) +
     labs(y = "Zero Results Overall", x = "") +
-    labs(title = "Daily Overall Zero Results Rate") + 
+    labs(title = "Daily Overall Zero Results Rate (Group)") + 
     theme(plot.title = element_text(hjust = 0.5), axis.text.x = element_text(hjust = 1, angle = 45), legend.position="none")
 
 ```
 
-Let session length be approximately the time between the first event and the last event in a session. Choose a variable from the dataset and describe its relationship to session length. Visualize the relationship.
+Using the above graph we can analyze how the Daily Overall Zero Results varies between the groups. We can notice that between the days 2016-03-05 and 2016-03-06 the group A had its lowest overall value while the group B had its higher overall value. The overall value of each group looks o behave independently.
+
+#### 4. Let session length be approximately the time between the first event and the last event in a session. Choose a variable from the dataset and describe its relationship to session length. Visualize the relationship.
+
+It is reasonable to infer that longer is the session length, more clicks the user made in the session.
 
 ```{r}
-# Testar a relação de 'session_length' com cada variavel.
+buscas %>%
+    ggplot(aes(x = session_length, y = num_clicks)) +
+    geom_point(alpha = .4, size=3)
 ```
 
-Summarize your findings in an executive summary.
-
-```{r}
-
-```
+However, the above graph shows that this relationship between 'num_clicks' and 'session_length' may not exist.
