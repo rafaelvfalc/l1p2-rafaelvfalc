@@ -1,0 +1,74 @@
+---
+title: "L3P5 - P-Valor"
+author: "Rafael Falcão"
+output:
+  prettydoc::html_pretty:
+    df_print: kable
+    theme: cayman
+    highlight: github
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+```{r}
+library(tidyverse)
+library(here)
+library(lubridate)
+theme_set(theme_bw())
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r ETL}
+buscas = read_csv(here::here("data/search_data.csv"))
+```
+
+## Perguntas
+
+Considerando que os dados da wikimedia que usamos no Laboratório 2, faça uma inferência sobre como é, na população de todas as sessões do site:
+
+### 1. A diferença entre o clickthrough rate dos grupos A e B;
+
+
+```{r}
+set.seed(1)
+
+theta_c <- function(df, i) {
+    agrupado = df %>%
+        slice(i) %>%
+        group_by(group) %>%
+        summarise(clickthrough = mean(num_clicks))
+    a = agrupado %>% filter(group == "a") %>% pull(clickthrough)
+    b = agrupado %>% filter(group == "b") %>% pull(clickthrough)
+    a-b
+}
+
+theta_embaralhado = function(d){
+    clickthrough = d %>% 
+        mutate(grupo_embaralhado = sample(group, n())) %>% 
+        group_by(grupo_embaralhado) %>% 
+        summarise(clickthrough = mean(num_clicks)) 
+    
+    a = clickthrough %>% filter(grupo_embaralhado == "a") %>% pull(clickthrough)
+    b = clickthrough %>% filter(grupo_embaralhado == "b") %>% pull(clickthrough)
+    
+    a - b
+}
+
+diffs = replicate(5000, {theta_embaralhado(buscas)})
+
+mean(abs(diffs) >= abs(theta_c(buscas, 1:NROW(buscas))))
+
+```
+
+### 2. A diferença na proporção buscas com zero resultados nos grupos A e B
+
+```{r}
+
+```
+
