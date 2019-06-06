@@ -38,11 +38,16 @@ Considerando que os dados da wikimedia que usamos no Laboratório 2, faça uma i
 ```{r}
 set.seed(1)
 
+buscas <- buscas %>% group_by(session_id, group) %>% 
+    summarise(session_length = first(session_length), 
+              sum_clicks = sum(num_clicks)) %>%
+    ungroup()
+
 theta_c <- function(df, i) {
     agrupado = df %>%
         slice(i) %>%
         group_by(group) %>%
-        summarise(clickthrough = mean(num_clicks))
+        summarise(clickthrough = sum(sum_clicks > 0)/n())
     a = agrupado %>% filter(group == "a") %>% pull(clickthrough)
     b = agrupado %>% filter(group == "b") %>% pull(clickthrough)
     a-b
@@ -52,7 +57,7 @@ theta_embaralhado = function(d){
     clickthrough = d %>% 
         mutate(grupo_embaralhado = sample(group, n())) %>% 
         group_by(grupo_embaralhado) %>% 
-        summarise(clickthrough = mean(num_clicks)) 
+        summarise(clickthrough = sum(sum_clicks > 0)/n()) 
     
     a = clickthrough %>% filter(grupo_embaralhado == "a") %>% pull(clickthrough)
     b = clickthrough %>% filter(grupo_embaralhado == "b") %>% pull(clickthrough)
@@ -63,12 +68,39 @@ theta_embaralhado = function(d){
 diffs = replicate(5000, {theta_embaralhado(buscas)})
 
 mean(abs(diffs) >= abs(theta_c(buscas, 1:NROW(buscas))))
-
 ```
 
 ### 2. A diferença na proporção buscas com zero resultados nos grupos A e B
 
 ```{r}
+set.seed(1)
 
+theta_c <- function(df, i) {
+    zero_results_rates = df %>%
+        slice(i) %>%
+        group_by(group) %>% 
+        summarise(zero_results_rate = sum(results == 0)/n()) 
+    
+    group.a = zero_results_rates %>% filter(group == "a") %>% pull(zero_results_rate)
+    group.b = zero_results_rates %>% filter(group == "b") %>% pull(zero_results_rate)
+    
+    group.a - group.b
+}
+
+theta_embaralhado = function(d){
+    zero_results_rate = d %>% 
+        mutate(grupo_embaralhado = sample(group, n())) %>% 
+        group_by(grupo_embaralhado) %>% 
+        summarise(zero_results_rate = sum(results == 0)/n()) 
+    
+    a = zero_results_rate %>% filter(grupo_embaralhado == "a") %>% pull(zero_results_rate)
+    b = zero_results_rate %>% filter(grupo_embaralhado == "b") %>% pull(zero_results_rate)
+    
+    a - b
+}
+
+diffs = replicate(5000, {theta_embaralhado(buscas)})
+
+mean(abs(diffs) >= abs(theta_c(buscas, 1:NROW(buscas))))
 ```
 
